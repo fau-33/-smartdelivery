@@ -1,20 +1,22 @@
 package br.com.javadevweek.smartdelivery.modules.products;
 
 import br.com.javadevweek.smartdelivery.modules.products.dto.CreateProductRequest;
+import br.com.javadevweek.smartdelivery.modules.products.dto.ListProductResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequestMapping("/products")
 @RestController
 public class ProductController {
     CreateProductUseCase createProductUseCase;
+    ProductService productService;
 
-    public ProductController(CreateProductUseCase createProductUseCase) {
+    public ProductController(CreateProductUseCase createProductUseCase, ProductService productService) {
         this.createProductUseCase = createProductUseCase;
+        this.productService = productService;
     }
     @PostMapping("/")
     public ResponseEntity<?> create(@RequestBody CreateProductRequest createProductRequest) {
@@ -24,5 +26,10 @@ public class ProductController {
         }catch (IllegalArgumentException ex) {
             return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(ex.getMessage());
         }
+    }
+    @GetMapping("/")
+    public List<ListProductResponse> findAll() {
+        return this.productService.findAll();
+
     }
 }
