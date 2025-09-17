@@ -1,8 +1,6 @@
-package br.com.javadevweek.smartdelivery;
+package br.com.javadevweek.smartdelivery.modules.customers;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
+import br.com.javadevweek.smartdelivery.ViaCepDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -10,15 +8,18 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class CreateCustomerUseCase {
 
+    private CustomerRepository customerRepository;
 
-    @PersistenceContext
-    private EntityManager em;
+    public CreateCustomerUseCase(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
+    }
+
 
     private CreateCustomerUseCase createCustomerUseCase;
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    @Transactional
+
     public void execute(CustomerEntity customerEntity) {
         String url = "https://viacep.com.br/ws/"+customerEntity.getZipCode()+"/json/";
 
@@ -29,14 +30,14 @@ public class CreateCustomerUseCase {
             throw new IllegalArgumentException("Erro ao consertar o CEP: " + customerEntity.getZipCode());
         }
 
-        String jpql = "SELECT count(c) FROM CustomerEntity c WHERE c.email = :email";
-        Long count = em.createQuery(jpql, Long.class)
-                        .setParameter("email", customerEntity.getEmail())
-                                .getSingleResult();
-       if(count > 0) {
-           throw new IllegalArgumentException("Email já existe");
-       }
-        em.persist(customerEntity);
+        // Buscar customer por email
+        this.customerRepository.findByEmail(customerEntity.getEmail())
+                .ifPresent(item -> {
+                    throw new IllegalArgumentException("Email já existe");
+                });
+
+        // Salvar customer
+        this.customerRepository.save(customerEntity);
         System.out.println(customerEntity);
     }
 }

@@ -1,4 +1,4 @@
-package br.com.javadevweek.smartdelivery;
+package br.com.javadevweek.smartdelivery.modules.customers;
 
 import jakarta.persistence.*;
 

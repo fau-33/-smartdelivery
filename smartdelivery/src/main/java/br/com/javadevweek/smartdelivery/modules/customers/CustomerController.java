@@ -1,4 +1,4 @@
-package br.com.javadevweek.smartdelivery;
+package br.com.javadevweek.smartdelivery.modules.customers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
